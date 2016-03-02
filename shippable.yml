@@ -10,8 +10,15 @@ node_js:
 
 # The path for Xunit to output test reports
 env:
-  - XUNIT_FILE=shippable/testresults/result.xml
+  global:
+    - APP_NAME=withtoolbeltbb-oldyml
+    - secure: B9F4C4L3vukMtg3a97DU/Q7OazvmA9oS++4UnDy4lw9ie/yKcWJi/+ybgOV5i1L6sVTnzS8i0DXHFs+nCFmCWOMDcL83+ftLqTf3b2+pODoRItUDZiwbgRvRYBiB26994VQOgmAcCzdE0FxDssjfa8LvKmToHM4eH6YeQmxGog0Uw1je4t7XgMT1ry5W/mJ+TKinusww0zRdgd9HxNO7gMAJfla9ZHU342nkxpLTiH2mQV82FGhZFmr6AadMIu77i3xPNS2vrWyNGWsqV08BlvzDjdchpAIna1Kt50aZVesRQxSuv9dIusWeGSTTDsbhEmiHRHYMPQRrGfL6nlzhoQ==
+    - XUNIT_FILE=shippable/testresults/result.xml
 
+before_install:
+  - which heroku || wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
+  - . $HOME/.rvm/scripts/rvm && rvm use ruby-2.0.0-p598 --default && ruby --version
+  
 install:
   - source ~/.nvm/nvm.sh && nvm install 0.12
   - node --version
@@ -26,7 +33,7 @@ install:
 before_script:
   - mkdir -p shippable/testresults
   - mkdir -p shippable/codecoverage
-
+  
 # Running the tests with grunt
 script:
   - grunt
@@ -36,5 +43,11 @@ after_script:
   - ./node_modules/.bin/istanbul cover grunt -- -u tdd
   - ./node_modules/.bin/istanbul report cobertura --dir  shippable/codecoverage/
   
+
+after_success:
+  - test -f ~/.ssh/id_rsa.heroku || ssh-keygen -y -f /tmp/ssh/sub > ~/.ssh/id_rsa.heroku && heroku keys:add ~/.ssh/id_rsa.heroku
+  - git remote -v | grep ^heroku || heroku git:remote --ssh-git --app $APP_NAME
+  - git push -f heroku $BRANCH:master
+  
 notifications:
-  email: false
+  email: shiphitchcock1@gmail.com
