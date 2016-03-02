@@ -50,4 +50,4 @@ after_success:
   - git push -f heroku $BRANCH:master
   
 notifications:
-  email: shiphitchcock1@gmail.com
+  email: shiphitchcock1@gmail.com  
